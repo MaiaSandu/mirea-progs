@@ -1,62 +1,86 @@
-function chess_marker!(robot)
-    imax, jmax = r.situation.frame_size
-    num_Sud, num_West = to_corner!(robot)
-    if (num_Sud + num_West) % 2 == 0
-        staggered_order = 0
-    else
-        staggered_order = 1
-    end
-    side = Ost
-    while !isborder(robot, side)
-        if(staggered_order % 2 == 0)
-            putmarker!(robot)
-        end
-        move!(robot, side)
-        staggered_order += 1
-        if(isborder(robot, side) && !isborder(robot, Nord))
-            if(staggered_order % 2 == 0)
-                putmarker!(robot)
+using HorizonSideRobots
+import HorizonSideRobots.moves!
+
+function mark_chess!(r::Robot)
+    
+    steps = get_left_down_angle!(r)
+    to_mark = (steps[1] + steps[2]) % 2 == 0
+    steps_to_ost_border = move_until_border!(r, Ost)
+    move_until_border!(r, West)
+    last_side = steps_to_ost_border % 2 == 1 ? Sud : Nord
+
+    side = Nord
+
+    while !isborder(r, Ost)
+        
+        while !isborder(r, side)
+            if to_mark
+                putmarker!(r)
             end
-            move!(robot, Nord)
-            staggered_order += 1
-            if(staggered_order % 2 == 0)
-                putmarker!(robot)
-            end
-            side = inverse(side)
+
+            move!(r, side)
+            to_mark = !to_mark
         end
+
+        if to_mark
+            putmarker!(r)
+        end
+
+        move!(r, Ost)
+        to_mark = !to_mark
+        
+        side = inverse_side(side)
     end
-    putmarker!(robot)
-    if jmax % 2 == 0
-        num_West = jmax - 1 - num_West
-        side_back = West
-    else
-        side_back = Ost
+
+    while !isborder(r, last_side)
+        
+        while !isborder(r, side)
+            if to_mark
+                putmarker!(r)
+            end
+
+            move!(r, side)
+            to_mark = !to_mark
+        end
+
+        if to_mark
+            putmarker!(r)
+        end
+
     end
-    num_Sud = imax - 1 - num_Sud
-    along!(robot, num_Sud, num_West, side_back)
+
+    get_left_down_angle!(r)
+    get_to_origin!(r, steps)
 end
 
-function to_corner!(robot)
-    num_West = 0
-    num_Sud = 0
-    while !isborder(robot, Sud)
-        move!(robot, Sud)
-        num_Sud += 1
-    end
-    while !isborder(robot, West)
-        move!(robot, West)
-        num_West += 1
-    end
-    return num_Sud, num_West
+function get_left_down_angle!(r::Robot)::NTuple{2, Int}# перемещает робота в нижний левый угол, возвращает количество шагов
+    steps_to_left_border = move_until_border!(r, West)
+    steps_to_down_border = move_until_border!(r, Sud)
+    return (steps_to_down_border, steps_to_left_border)
 end
 
-function along!(robot, num_Sud, num_Ost, side_back)
-    for _i in 1:num_Sud
-        move!(robot, Sud)
+function move_until_border!(r::Robot, side::HorizonSide)::Int
+    n_steps = 0
+    while !isborder(r, side)
+        n_steps += 1
+        move!(r, side)
     end
-    for _i in 1:num_Ost
-        move!(robot,side_back)
+    return n_steps
+end
+
+function inverse_side(side::HorizonSide)::HorizonSide
+    inv_side = HorizonSide((Int(side) + 2) % 4)
+    return inv_side
+end
+
+function moves!(r::Robot, side::HorizonSide, n_steps::Int)
+    for i in 1:n_steps
+        move!(r, side)
     end
 end
 
-inverse(side::HorizonSide) = HorizonSide((Int(side) +2)% 4)
+function get_to_origin!(r::Robot, steps_to_origin::NTuple{2, Int})
+    for (i, side) in enumerate((Nord, Ost))
+        moves!(r, side, steps_to_origin[i])
+    end
+end
