@@ -9,12 +9,11 @@ end
 
 
 function along!(robot, side)
-    while try_move!(robot, side) # - в этом логическом выражении порядок аргументов важен!
+    while try_move!(robot, side)
     end
 end
 
-function snake!( robot, (move_side, next_row_side)::NTuple{2,HorizonSide} = (Nord, Ost)) # - это обобщенная функция
-    # Робот - в (inverse(next_row_side), inverse(move_side))-углу поля
+function snake!( robot, (move_side, next_row_side)::NTuple{2,HorizonSide} = (Nord, Ost))
     along!(robot, move_side)
     while try_move!(robot, next_row_side)
         move_side = inverse(move_side)
