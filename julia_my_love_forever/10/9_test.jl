@@ -1,4 +1,4 @@
 using HorizonSideRobots
-include("10.jl")
+include("9.jl")
 r = Robot("untitled.sit", animate=true)
-mark_chess!(r, 2)
+chess1!(r)
