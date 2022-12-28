@@ -8,5 +8,5 @@ function next_kletka!(robot, side)
     end
 end
 
-right(side::HorizonSide) = HorizonSide((Int(side) +1)% 4)
-left(side::HorizonSide) = HorizonSide((Int(side) +3)% 4)
+right(side::HorizonSide) = HorizonSide((Int(side)+3)%4)
+left(side::HorizonSide) = HorizonSide((Int(side)+1)%4)
