@@ -1,4 +1,4 @@
-function chess1!(robot, n)
+function chess2!(robot, n)
     staggered_order = 0
     side = Ost
     for _i in 1:n
