@@ -1,4 +1,4 @@
-sing HorizonSideRobots
+using HorizonSideRobots
 
 function try_move!(robot, side)
     if isborder(robot, side)
