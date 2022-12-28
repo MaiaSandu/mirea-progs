@@ -1,47 +1,26 @@
-function count_partitions(robot)
-    side = Ost
-    count = 0
-    count_check = 0
-    count_blank = 0
-    count_total = 0
-    while !isborder(robot, side)
+sing HorizonSideRobots
+
+function try_move!(robot, side)
+    if isborder(robot, side)
+        return false
+    else 
         move!(robot, side)
-        if isborder(robot, Nord)
-            count_blank = 0
-            count += 1;
-            count_check += 1
-        elseif !isborder(robot, Nord) 
-            count_blank += 1
-            if (count_blank <= 1) 
-                count += 1;
-                count_check += 1
-            else
-                if (count == 0 || count_check == 0)
-                    count_total += 0
-                else 
-                    count_total += count / count_check
-                    count = 0
-                    count_check = 0
-                end
-            end
-        end
-        if isborder(robot, side) && !isborder(robot, Nord)
-            if (count_blank <= 1)
-                if (count == 0 || count_check == 0)
-                    count_total += 0
-                else 
-                    count_total += count / count_check
-                    count = 0
-                    count_check = 0
-                end
-            end
-            move!(robot, Nord)
-            side = inverse(side)
-            count = 0
-            count_check = 0
-        end
+        return true
     end
-    return count_total
+end
+
+
+function along!(robot, side)
+    while try_move!(robot, side)
+    end
+end
+
+function snake!( robot, (move_side, next_row_side)::NTuple{2,HorizonSide} = (Nord, Ost))
+    along!(robot, move_side)
+    while try_move!(robot, next_row_side)
+        move_side = inverse(move_side)
+        along!(robot, move_side)
+    end
 end
 
 inverse(side::HorizonSide) = HorizonSide((Int(side) +2)% 4)
